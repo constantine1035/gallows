@@ -1,0 +1,6 @@
+/Users/admin/CLionProjects/gallows/cmake-build-debug/CMakeFiles/gallows.dir
+/Users/admin/CLionProjects/gallows/cmake-build-debug/CMakeFiles/test_gallows.dir
+/Users/admin/CLionProjects/gallows/cmake-build-debug/CMakeFiles/gtest.dir
+/Users/admin/CLionProjects/gallows/cmake-build-debug/CMakeFiles/test.dir
+/Users/admin/CLionProjects/gallows/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/admin/CLionProjects/gallows/cmake-build-debug/CMakeFiles/rebuild_cache.dir

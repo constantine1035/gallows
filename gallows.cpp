@@ -23,7 +23,9 @@ void gallows() {
     int number_correct = 0;
     std::vector<char> mistakes;
     std::vector<char> ready(word.size());
+    std::cout << "Game started\n";
     while (number_mistakes < 6) {
+        std::cout << "Guess the letter: ";
         std::string guess;
         std::cin >> guess;
         if (guess.size() == 1) {
@@ -35,6 +37,7 @@ void gallows() {
                     }
                 }
                 if (number_correct == word.size()) {
+                    std::cout << "You won!\n";
                     break;
                 }
                 std::cout << "Correct:\n";
@@ -45,9 +48,9 @@ void gallows() {
             } else {
                 mistakes.push_back(guess[0]);
                 ++number_mistakes;
-                std::cout << "Mistake:\n";
+                std::cout << "Mistakes:\n";
                 for (char i : mistakes) {
-                    std::cout << i << ", ";
+                    std::cout << i << " ";
                 }
                 std::cout << '\n';
             }
