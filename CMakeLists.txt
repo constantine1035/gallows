@@ -3,28 +3,17 @@ project(gallows)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+
+include(FetchContent)
+FetchContent_Declare(SFML
+        GIT_REPOSITORY https://github.com/SFML/SFML.git
+        GIT_TAG 2.6.x)
+FetchContent_MakeAvailable(SFML)
+
 add_executable(gallows main.cpp gallows.cpp)
+target_link_libraries(gallows PRIVATE sfml-graphics)
+target_compile_features(gallows PRIVATE cxx_std_17)
 
-# GTest
-enable_testing()  # Включаем поддержку тестирования в CMake
-
-# Добавляем исполняемый файл тестов
-add_executable(test_gallows test.cpp gallows.cpp)
-
-# Добавляем библиотеку Google Test
-add_library(gtest STATIC
-        contrib/gtest/googletest/src/gtest-all.cc)
-
-# Включаем директории заголовочных файлов для Google Test
-target_include_directories(gtest
-        PUBLIC contrib/gtest/googletest/include
-        PUBLIC contrib/gtest/googletest)
-
-# Линкуем библиотеки с тестами и gtest
-target_link_libraries(test_gallows
-        gtest
-        pthread)
-
-# Добавляем тест в систему тестирования CMake
-add_test(test_gallows test_gallows)
-
+install(TARGETS gallows)
