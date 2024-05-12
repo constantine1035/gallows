@@ -103,7 +103,7 @@ void gallows() {
                         break;
                     }
                     if (number_mistakes > 5) {
-                        text.setString("Game over");
+                        text.setString("    Game over\nCorrect word: " + word);
                         break;
                     }
                 }
