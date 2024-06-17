@@ -4,7 +4,7 @@
 #include <string>
 #include <ctime>
 
-std::vector<std::string> words = {
+const std::vector<std::string> words = {
         "car", "dog", "house", "cat", "book", "pen", "chair", "table", "computer",
         "phone", "sun", "moon", "tree", "flower", "river", "mountain", "baby", "bird",
         "fish", "friend", "teacher", "parent", "child", "doctor", "nurse", "artist",
@@ -21,6 +21,12 @@ std::vector<std::string> words = {
         "swimming", "tennis", "hockey", "baseball", "football"
 };
 
+const std::vector<std::string> gall = {
+"|-----|\n\n|     |\n\n|     |\n\n|     |\n\n|     \n\n|-----|\n\n", "|-----|\n\n|     |\n\n|     |\n\n|     |\n\n|    /|\n\n|-----|\n\n",
+"|-----|\n\n|     |\n\n|     |\n\n|     |\n\n|    /|\\\n\n|-----|\n\n" ,"|-----|\n\n|     |\n\n|     |\n\n|     |\n\n|    /|\\\n\n|    /\n\n|-----|\n\n"
+,"|-----|\n\n|     |\n\n|     |\n\n|     |\n\n|    /|\\\n\n|    / \\\n\n|-----|\n\n",
+"|-----|\n\n|     |\n\n|    /|\\\n\n|    / \\\n\n|     \n\n|     \n\n|-----|\n\n"};
+
 std::string get_current_word(const std::vector<char>& ready) {
     return std::string(ready.begin(), ready.end());
 }
@@ -30,7 +36,7 @@ std::string get_current_mistakes(const std::vector<char>& mistakes) {
 }
 
 std::string get_play_screen(const std::string& input, const std::vector<char>& ready, const std::vector<char>& mistakes) {
-    return "Guess the letter: " + input + "\nCurrent word: " + get_current_word(ready) + "\nCurrent mistakes: " + get_current_mistakes(mistakes);
+    return gall[(mistakes.size() < 5 ? mistakes.size() : 5)] + "Guess the letter: " + input + "\n\nCurrent word: " + get_current_word(ready) + "\n\nCurrent mistakes: " + get_current_mistakes(mistakes);
 }
 
 bool find_mistake(const char& letter, const std::vector<char>& mistakes) {
@@ -62,14 +68,14 @@ void gallows() {
     int number_entered = 0;
     std::vector<char> mistakes;
     std::vector<char> ready(word.size(), '.');
-    sf::RenderWindow window(sf::VideoMode(500, 500), "SFML works!");
+    sf::RenderWindow window(sf::VideoMode(1000, 1000), "Gallows");
     sf::Text text;
     sf::Font font;
-    font.loadFromFile("../../light-arial.ttf");
+    font.loadFromFile("../../silkscreen.ttf");
     text.setString("Game started\n\nPress any button");
-    text.setPosition(200, 200);
+    text.setPosition(400, 400);
     text.setFont(font);
-    text.setCharacterSize(24);
+    text.setCharacterSize(20);
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -103,12 +109,12 @@ void gallows() {
                     process_input(inputText, ready, mistakes, number_correct, number_mistakes, word);
                     text.setString(get_play_screen(inputText, ready, mistakes));
                     if (number_correct == word.size()) {
-                        text.setString("\t\t\tGame won!\nCorrect word: " + word + "\nPress Enter to restart");
+                        text.setString("\t\tGame won!\n\nCorrect word: " + word + "\n\nPress Enter to restart\n");
                         is_end = true;
                         break;
                     }
                     if (number_mistakes > 5) {
-                        text.setString("\t\t\tGame over\nCorrect word: " + word + "\nPress Enter to restart");
+                        text.setString("\t\tGame over\n\nCorrect word: " + word + "\n\nPress Enter to restart\n");
                         is_end = true;
                         break;
                     }
