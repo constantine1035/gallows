@@ -89,11 +89,10 @@ void choose_difficulty(sf::RenderWindow& window, std::vector<std::string>& selec
     }
 }
 
-std::string get_input_word(sf::RenderWindow& window, sf::Text& text) {
+std::string get_input_word(sf::RenderWindow& window, sf::Text& text, sf::Color& curr_col) {
     std::string input_word;
     text.setString("Enter a word for your friend to guess:");
     text.setPosition(200, 400);
-
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -112,9 +111,21 @@ std::string get_input_word(sf::RenderWindow& window, sf::Text& text) {
                     input_word += static_cast<char>(event.text.unicode);
                 }
                 text.setString("Enter a word for your friend to guess:\n\n" + input_word);
+            } else if (event.type == sf::Event::KeyPressed) {
+                if (event.key.code == sf::Keyboard::Escape) {
+                    window.close();
+                }
+                if (event.key.code == sf::Keyboard::Tab) {
+                    curr_col = sf::Color(100, 100, 100, 255);
+                }
+                if (event.key.code == sf::Keyboard::Enter) {
+                    if (!input_word.empty()) {
+                        return input_word;
+                    }
+                }
             }
         }
-        window.clear();
+        window.clear(curr_col);
         window.draw(text);
         window.display();
     }
@@ -151,6 +162,7 @@ void gallows() {
     std::vector<std::string> selected_words;
 
     // Создание окна
+    sf::Color curr_col;
     sf::RenderWindow window(sf::VideoMode(1000, 1000), "Gallows");
     sf::Text text;
     sf::Font font;
@@ -165,7 +177,7 @@ void gallows() {
         choose_difficulty(window, selected_words, text);
         word = selected_words[std::rand() % selected_words.size()];
     } else if (mode == 2) {
-        word = get_input_word(window, text);
+        word = get_input_word(window, text, curr_col);
     }
 
     int number_mistakes = 0;
@@ -187,21 +199,6 @@ void gallows() {
                     text.setString(get_play_screen(" ", ready, mistakes));
                     continue;
                 }
-                if (event.text.unicode == '\n' && is_end) { // Check for Enter key
-                    is_end = false;
-                    if (mode == 1) {
-                        word = selected_words[std::rand() % selected_words.size()]; // Generate new word
-                    } else if (mode == 2) {
-                        word = get_input_word(window, text);
-                    }
-                    number_mistakes = 0;
-                    number_correct = 0;
-                    number_entered = 0;
-                    mistakes.clear();
-                    ready.assign(word.size(), '.');
-                    text.setString(get_play_screen(" ", ready, mistakes));
-                    continue;
-                }
                 if (event.text.unicode == 8 && is_end) { // Check for Backspace key
                     is_end = false;
                     number_mistakes = 0;
@@ -215,7 +212,7 @@ void gallows() {
                         choose_difficulty(window, selected_words, text);
                         word = selected_words[std::rand() % selected_words.size()];
                     } else if (mode == 2) {
-                        word = get_input_word(window, text);
+                        word = get_input_word(window, text, curr_col);
                     }
                     text.setString(get_play_screen(" ", ready, mistakes));
                     continue;
@@ -245,9 +242,27 @@ void gallows() {
                 if (event.key.code == sf::Keyboard::Escape) {
                     window.close();
                 }
+                if (event.key.code == sf::Keyboard::Tab) {
+                    curr_col = sf::Color(100, 100, 100, 255);
+                }
+                if (event.key.code == sf::Keyboard::Enter && is_end) { // Check for Enter key
+                    is_end = false;
+                    if (mode == 1) {
+                        word = selected_words[std::rand() % selected_words.size()]; // Generate new word
+                    } else if (mode == 2) {
+                        word = get_input_word(window, text, curr_col);
+                    }
+                    number_mistakes = 0;
+                    number_correct = 0;
+                    number_entered = 0;
+                    mistakes.clear();
+                    ready.assign(word.size(), '.');
+                    text.setString(get_play_screen(" ", ready, mistakes));
+                    continue;
+                }
             }
         }
-        window.clear();
+        window.clear(curr_col);
         window.draw(text);
         window.display();
     }
