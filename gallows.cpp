@@ -116,7 +116,7 @@ std::string get_input_word(sf::RenderWindow& window, sf::Text& text, sf::Color& 
                     window.close();
                 }
                 if (event.key.code == sf::Keyboard::Tab) {
-                    curr_col = sf::Color(100, 100, 100, 255);
+                    curr_col = sf::Color(255, 0, 0, 0);
                 }
                 if (event.key.code == sf::Keyboard::Enter) {
                     if (!input_word.empty()) {
@@ -243,7 +243,7 @@ void gallows() {
                     window.close();
                 }
                 if (event.key.code == sf::Keyboard::Tab) {
-                    curr_col = sf::Color(100, 100, 100, 255);
+                    curr_col = sf::Color(255, 0, 0, 0);
                 }
                 if (event.key.code == sf::Keyboard::Enter && is_end) { // Check for Enter key
                     is_end = false;
