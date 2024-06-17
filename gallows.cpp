@@ -89,6 +89,61 @@ void choose_difficulty(sf::RenderWindow& window, std::vector<std::string>& selec
     }
 }
 
+std::string get_input_word(sf::RenderWindow& window, sf::Text& text) {
+    std::string input_word;
+    text.setString("Enter a word for your friend to guess:");
+    text.setPosition(200, 400);
+
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            } else if (event.type == sf::Event::TextEntered) {
+                if (event.text.unicode == '\n') { // Enter key
+                    if (!input_word.empty()) {
+                        return input_word;
+                    }
+                } else if (event.text.unicode == 8) { // Backspace key
+                    if (!input_word.empty()) {
+                        input_word.pop_back();
+                    }
+                } else if (event.text.unicode >= 32 && event.text.unicode <= 126) { // Printable characters
+                    input_word += static_cast<char>(event.text.unicode);
+                }
+                text.setString("Enter a word for your friend to guess:\n\n" + input_word);
+            }
+        }
+        window.clear();
+        window.draw(text);
+        window.display();
+    }
+    return "";
+}
+
+void choose_mode(sf::RenderWindow& window, int& mode, sf::Text& text) {
+    text.setString("Select mode:\n\n1 - Solo\n\n2 - With Friend");
+    text.setPosition(400, 400);
+
+    while (window.isOpen() && mode == 0) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            } else if (event.type == sf::Event::TextEntered) {
+                if (event.text.unicode == '1') {
+                    mode = 1; // Solo
+                } else if (event.text.unicode == '2') {
+                    mode = 2; // With Friend
+                }
+            }
+        }
+        window.clear();
+        window.draw(text);
+        window.display();
+    }
+}
+
 void gallows() {
     bool is_end = false;
     std::srand(static_cast<unsigned>(std::time(nullptr)));
@@ -103,9 +158,16 @@ void gallows() {
     text.setFont(font);
     text.setCharacterSize(20);
 
-    choose_difficulty(window, selected_words, text);
+    int mode = 0;
+    choose_mode(window, mode, text);
 
-    word = selected_words[std::rand() % selected_words.size()];
+    if (mode == 1) {
+        choose_difficulty(window, selected_words, text);
+        word = selected_words[std::rand() % selected_words.size()];
+    } else if (mode == 2) {
+        word = get_input_word(window, text);
+    }
+
     int number_mistakes = 0;
     int number_correct = 0;
     int number_entered = 0;
@@ -127,7 +189,11 @@ void gallows() {
                 }
                 if (event.text.unicode == '\n' && is_end) { // Check for Enter key
                     is_end = false;
-                    word = selected_words[std::rand() % selected_words.size()]; // Generate new word
+                    if (mode == 1) {
+                        word = selected_words[std::rand() % selected_words.size()]; // Generate new word
+                    } else if (mode == 2) {
+                        word = get_input_word(window, text);
+                    }
                     number_mistakes = 0;
                     number_correct = 0;
                     number_entered = 0;
@@ -143,8 +209,14 @@ void gallows() {
                     number_entered = 0;
                     mistakes.clear();
                     ready.assign(word.size(), '.');
-                    choose_difficulty(window, selected_words, text);
-                    word = selected_words[std::rand() % selected_words.size()];
+                    mode = 0;
+                    choose_mode(window, mode, text);
+                    if (mode == 1) {
+                        choose_difficulty(window, selected_words, text);
+                        word = selected_words[std::rand() % selected_words.size()];
+                    } else if (mode == 2) {
+                        word = get_input_word(window, text);
+                    }
                     text.setString(get_play_screen(" ", ready, mistakes));
                     continue;
                 }
@@ -159,12 +231,12 @@ void gallows() {
                     process_input(inputText, ready, mistakes, number_correct, number_mistakes, word);
                     text.setString(get_play_screen(inputText, ready, mistakes));
                     if (number_correct == word.size()) {
-                        text.setString("\t\tGame won!\n\nCorrect word: " + word + "\n\nPress Enter to restart\n\nPress Backspace to change difficulty\n");
+                        text.setString("\t\tGame won!\n\nCorrect word: " + word + "\n\nPress Enter to restart\n\nPress Backspace to change mode\n");
                         is_end = true;
                         break;
                     }
                     if (number_mistakes > 5) {
-                        text.setString("\t\tGame over\n\nCorrect word: " + word + "\n\nPress Enter to restart\n\nPress Backspace to change difficulty\n");
+                        text.setString("\t\tGame over\n\nCorrect word: " + word + "\n\nPress Enter to restart\n\nPress Backspace to change mode\n");
                         is_end = true;
                         break;
                     }
