@@ -4,28 +4,29 @@
 #include <string>
 #include <ctime>
 
-const std::vector<std::string> words = {
-        "car", "dog", "house", "cat", "book", "pen", "chair", "table", "computer",
-        "phone", "sun", "moon", "tree", "flower", "river", "mountain", "baby", "bird",
-        "fish", "friend", "teacher", "parent", "child", "doctor", "nurse", "artist",
-        "actor", "singer", "writer", "scientist", "engineer", "student", "employee",
-        "boss", "coworker", "police", "firefighter", "soldier", "lawyer", "judge",
-        "prisoner", "detective", "thief", "singer", "dancer", "composer", "chef",
-        "waiter", "customer", "driver", "passenger", "bicycle", "bus", "train", "plane",
-        "ship", "boat", "radio", "television", "newspaper", "magazine", "internet",
-        "library", "school", "university", "hospital", "office", "restaurant", "zoo",
-        "park", "beach", "garden", "farm", "store", "market", "mall", "supermarket",
-        "gym", "bank", "church", "mosque", "temple", "synagogue", "politics", "economy",
-        "history", "geography", "mathematics", "science", "chemistry", "biology",
-        "physics", "art", "music", "literature", "film", "sport", "soccer", "basketball",
-        "swimming", "tennis", "hockey", "baseball", "football"
+const std::vector<std::string> easy_words = {
+        "car", "dog", "cat", "book", "pen", "chair", "table", "phone", "sun", "moon",
+        "bird", "fish", "tree", "flower", "rain", "snow", "apple", "banana", "grape", "peach",
+        "blue", "red", "green", "yellow", "house", "milk", "bread", "water", "egg", "sand"
+};
+
+const std::vector<std::string> medium_words = {
+        "computer", "tree", "flower", "river", "mountain", "baby", "bird", "fish", "friend", "teacher",
+        "police", "doctor", "nurse", "artist", "actor", "singer", "writer", "scientist", "engineer", "student",
+        "employee", "boss", "coworker", "library", "school", "university", "hospital", "office", "restaurant", "market"
+};
+
+const std::vector<std::string> hard_words = {
+        "scientist", "engineer", "detective", "prisoner", "composer", "customer", "bicycle", "restaurant", "supermarket", "university",
+        "economy", "politics", "history", "geography", "mathematics", "chemistry", "biology", "physics", "literature", "psychology",
+        "philosophy", "architecture", "archaeology", "astrology", "anthropology", "cryptography", "biotechnology", "neuroscience", "nanotechnology", "quantum"
 };
 
 const std::vector<std::string> gall = {
-"|-----|\n\n|     |\n\n|     |\n\n|     |\n\n|     \n\n|-----|\n\n", "|-----|\n\n|     |\n\n|     |\n\n|     |\n\n|    /|\n\n|-----|\n\n",
-"|-----|\n\n|     |\n\n|     |\n\n|     |\n\n|    /|\\\n\n|-----|\n\n" ,"|-----|\n\n|     |\n\n|     |\n\n|     |\n\n|    /|\\\n\n|    /\n\n|-----|\n\n"
-,"|-----|\n\n|     |\n\n|     |\n\n|     |\n\n|    /|\\\n\n|    / \\\n\n|-----|\n\n",
-"|-----|\n\n|     |\n\n|    /|\\\n\n|    / \\\n\n|     \n\n|     \n\n|-----|\n\n"};
+        "|-----|\n\n|     |\n\n|     |\n\n|     |\n\n|     \n\n|-----|\n\n", "|-----|\n\n|     |\n\n|     |\n\n|     |\n\n|    /|\n\n|-----|\n\n",
+        "|-----|\n\n|     |\n\n|     |\n\n|     |\n\n|    /|\\\n\n|-----|\n\n" ,"|-----|\n\n|     |\n\n|     |\n\n|     |\n\n|    /|\\\n\n|    /\n\n|-----|\n\n"
+        ,"|-----|\n\n|     |\n\n|     |\n\n|     |\n\n|    /|\\\n\n|    / \\\n\n|-----|\n\n",
+        "|-----|\n\n|     |\n\n|    /|\\\n\n|    / \\\n\n|     \n\n|     \n\n|-----|\n\n"};
 
 std::string get_current_word(const std::vector<char>& ready) {
     return std::string(ready.begin(), ready.end());
@@ -59,23 +60,60 @@ void process_input(const std::string& guess, std::vector<char>& ready, std::vect
     }
 }
 
+void choose_difficulty(sf::RenderWindow& window, std::vector<std::string>& selected_words, sf::Text& text) {
+    int difficulty = 0;
+    text.setString("Select difficulty:\n\n1 - Easy\n\n2 - Medium\n\n3 - Hard");
+    text.setPosition(400, 400);
+
+    while (window.isOpen() && difficulty == 0) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            } else if (event.type == sf::Event::TextEntered) {
+                if (event.text.unicode == '1') {
+                    selected_words = easy_words;
+                    difficulty = 1;
+                } else if (event.text.unicode == '2') {
+                    selected_words = medium_words;
+                    difficulty = 2;
+                } else if (event.text.unicode == '3') {
+                    selected_words = hard_words;
+                    difficulty = 3;
+                }
+            }
+        }
+        window.clear();
+        window.draw(text);
+        window.display();
+    }
+}
+
 void gallows() {
     bool is_end = false;
     std::srand(static_cast<unsigned>(std::time(nullptr)));
-    std::string word = words[std::rand() % words.size()];
+    std::string word;
+    std::vector<std::string> selected_words;
+
+    // Создание окна
+    sf::RenderWindow window(sf::VideoMode(1000, 1000), "Gallows");
+    sf::Text text;
+    sf::Font font;
+    font.loadFromFile("../../silkscreen.ttf");
+    text.setFont(font);
+    text.setCharacterSize(20);
+
+    choose_difficulty(window, selected_words, text);
+
+    word = selected_words[std::rand() % selected_words.size()];
     int number_mistakes = 0;
     int number_correct = 0;
     int number_entered = 0;
     std::vector<char> mistakes;
     std::vector<char> ready(word.size(), '.');
-    sf::RenderWindow window(sf::VideoMode(1000, 1000), "Gallows");
-    sf::Text text;
-    sf::Font font;
-    font.loadFromFile("../../silkscreen.ttf");
     text.setString("Game started\n\nPress any button");
     text.setPosition(400, 400);
-    text.setFont(font);
-    text.setCharacterSize(20);
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -89,12 +127,24 @@ void gallows() {
                 }
                 if (event.text.unicode == '\n' && is_end) { // Check for Enter key
                     is_end = false;
-                    word = words[std::rand() % words.size()]; // Generate new word
+                    word = selected_words[std::rand() % selected_words.size()]; // Generate new word
                     number_mistakes = 0;
                     number_correct = 0;
                     number_entered = 0;
                     mistakes.clear();
                     ready.assign(word.size(), '.');
+                    text.setString(get_play_screen(" ", ready, mistakes));
+                    continue;
+                }
+                if (event.text.unicode == 8 && is_end) { // Check for Backspace key
+                    is_end = false;
+                    number_mistakes = 0;
+                    number_correct = 0;
+                    number_entered = 0;
+                    mistakes.clear();
+                    ready.assign(word.size(), '.');
+                    choose_difficulty(window, selected_words, text);
+                    word = selected_words[std::rand() % selected_words.size()];
                     text.setString(get_play_screen(" ", ready, mistakes));
                     continue;
                 }
@@ -109,12 +159,12 @@ void gallows() {
                     process_input(inputText, ready, mistakes, number_correct, number_mistakes, word);
                     text.setString(get_play_screen(inputText, ready, mistakes));
                     if (number_correct == word.size()) {
-                        text.setString("\t\tGame won!\n\nCorrect word: " + word + "\n\nPress Enter to restart\n");
+                        text.setString("\t\tGame won!\n\nCorrect word: " + word + "\n\nPress Enter to restart\n\nPress Backspace to change difficulty\n");
                         is_end = true;
                         break;
                     }
                     if (number_mistakes > 5) {
-                        text.setString("\t\tGame over\n\nCorrect word: " + word + "\n\nPress Enter to restart\n");
+                        text.setString("\t\tGame over\n\nCorrect word: " + word + "\n\nPress Enter to restart\n\nPress Backspace to change difficulty\n");
                         is_end = true;
                         break;
                     }
